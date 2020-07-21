@@ -28,7 +28,7 @@ Installation
 
 Install ``djvue`` (or `download from PyPI <http://pypi.python.org/pypi/djvue>`__):
 
-.. code-block:: python
+.. code-block:: bash
 
     pip install djvue
 
@@ -102,7 +102,7 @@ Your views will require to return the serializer definition and the rendered tem
 
     class LoginView(CreateAPIView):
         renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-        serializer_class = LoginSerializer removed once the
+        serializer_class = LoginSerializer
         template_name = "login.html"
 
         def get(self, request, *args, **kwargs):
@@ -139,8 +139,8 @@ Each form is another Vue instance.
 Form definition
 ***************
 
-ValidationObserver
-------------------
+validation-observer
+-------------------
 
 Define the form using VeeValidates's `ValidationObserver <https://logaretm.github.io/vee-validate/api/validation-observer.html#scoped-slot-props>`_ component.
 
@@ -277,9 +277,9 @@ A hybrid file field. Renders an input type, accepts as input a dictionary contai
 
 
     class PDFUploadSerializer(FileUploadSerializer):
-    """
-    Allows only PDF files to be uploaded
-    """
+        """
+        Allows only PDF files to be uploaded
+        """
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self.fields["file"].validators.append(FileExtensionValidator(allowed_extensions=['pdf']))
@@ -319,7 +319,7 @@ Upon form submission, the uploaded files must be linked with some model or pushe
 
 .. code-block:: python
 
-    class ProfileSerializer(serializers.ModelSerializer)
+    class ProfileSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
             user_file = validated_data.pop("file", None)
             profile = Profile.objects.create(**validated_data)
@@ -377,7 +377,7 @@ At this moment formset are indeed supported, but they have to be written by hand
             list_serializer_class = serializers.ListSerializer
 
 
-     class ProfileSerializer(serializers.ModelSerializer)
+    class ProfileSerializer(serializers.ModelSerializer):
         # ...
         addresses = AddressSerializer(many=True)
 
