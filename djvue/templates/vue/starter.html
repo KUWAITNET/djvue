@@ -1,21 +1,29 @@
-{% load static %}
+{% load static i18n %}
 
+<script>
+    let uploadURL = '{% url "djvue:file_upload" %}'
+</script>
 <script src="{% static 'vue/js/vue.js' %}"></script>
 <script src="{% static 'vue/js/vee-validate.full.js' %}"></script>
 <script src="{% static 'vue/js/axios.js' %}"></script>
 <script src="{% static 'vue/js/lodash.js' %}"></script>
 <script>
+
     Vue.component("validation-provider", VeeValidate.ValidationProvider)
     Vue.component("validation-observer", VeeValidate.ValidationObserver)
-    VeeValidate.localize({{ vee_validate_locale|safe }})
-    VeeValidate.localize('{{ request.LANGUAGE_CODE }}')
 
+    VeeValidate.localize({{ vv_locale|safe }})
+    VeeValidate.localize('{{ vv_lang }}')
     VeeValidate.extend("password", {
-        params: ["target"],
-        validate(value, {target}) {
-            return value === target
-        },
-        message: "Password confirmation does not match",
+      params: ["target"],
+      validate(value, {target}) {
+        return value === target
+      },
+      message: '{% trans "Password confirmation does not match" %}',
     })
+
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+
 </script>
 <script src="{% static 'vue/js/script.js' %}"></script>

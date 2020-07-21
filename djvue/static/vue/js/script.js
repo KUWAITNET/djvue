@@ -2,7 +2,7 @@ let nonFieldErrorsKey = "non_field_errors"
 let detailErrorKey = "detail"
 let errorKeys = [nonFieldErrorsKey, detailErrorKey]
 
-let djMixin = {
+let djVueMixin = {
   delimiters: ["{(", ")}"],
   data() {
     return {
@@ -10,7 +10,8 @@ let djMixin = {
       nonFieldErrors: [],
       actionURL: null,
       form: {},
-      formsetRefs: [],
+      files: {},
+      fileUploadURL: uploadURL
     }
   },
   mounted() {
@@ -19,20 +20,29 @@ let djMixin = {
     })
   },
   methods: {
+    getFieldsetRefs() {
+      return Object.keys(this.form).filter(key => _.isPlainObject(this.form[key]))
+    },
+    getFormsetRefs() {
+      return Object.keys(this.form).filter(key => _.isArray(this.form[key]))
+    },
     submit() {
       // reset errors
       this.nonFieldErrors = []
-      axios.post(this.actionURL, this.form).then(this.success).catch(this.error)
+      axios.post(this.actionURL, Object.assign({}, this.form, this.files))
+          .then(this.success)
+          .catch(this.error)
     },
     success(response) {
-      console.log(response)
+      alert("You must implemented success method.")
     },
     error(error, ref = "form") {
-      if (error.response) {
+
+      if (error.response && error.response.status === 400) {
         let errors = error.response.data
         this.renderFieldErrors(errors, ref)
       } else {
-        this.nonFieldErrors.push(error.message)
+        this.nonFieldErrors.push("Error! Contact an administrator.")
       }
     },
     renderFieldErrors(errors, ref = "form") {
@@ -43,18 +53,53 @@ let djMixin = {
         // rest framework _non_field_errors_: global error
         this.nonFieldErrors = errors[nonFieldErrorsKey]
       } else if (!_.has(errors, nonFieldErrorsKey)) {
-        // formset field errors //
-        this.renderFormsetsError(errors)
-        // form errors
-        this.$refs[ref].setErrors(errors)
+        // fieldset errors
+        this.renderFieldsetErrors(errors)
+        // formset errors
+        this.renderFormsetErrors(errors)
+
+        // field errors
+        // remove all keys that are having . or values are {}
+        // to avoid double rendering of nested errors
+        let fieldErrors = {}
+
+        Object.keys(errors).forEach(key=> {
+          if (!key.includes('.') && _.isArray(errors[key])) fieldErrors[key] = errors[key]
+        })
+
+        this.$refs[ref].setErrors(fieldErrors)
       }
     },
 
-    renderFormsetsError(errors) {
-      this.formsetRefs.forEach((formsetItem) => {
+    renderFieldsetErrors(errors) {
+      this.getFieldsetRefs().forEach(fieldsetRef => {
+        if (errors.hasOwnProperty(fieldsetRef)) {
+          // append the parent name to the field name
+          let fieldsetErrors = errors[fieldsetRef]
+          Object.keys(fieldsetErrors).forEach(key => {
+            if (!errorKeys.includes(key)) {
+              fieldsetErrors[`${fieldsetRef}.${key}`] = fieldsetErrors[key]
+              delete fieldsetErrors[key]
+            }
+          })
+
+          // raise field errors
+          this.$refs[fieldsetRef].setErrors(fieldsetErrors)
+          // raise global errors like non_field_errors
+          this.renderFieldErrors(fieldsetErrors, fieldsetRef)
+        }
+      })
+    },
+
+    renderFormsetErrors(errors) {
+      this.getFormsetRefs().forEach(formsetItem => {
+        // if errors[formsetItem] is object, means
+        // the error is fieldset related and not for
+        // the formsets, so skip it quickly
         if (errors.hasOwnProperty(formsetItem)) {
           let formsetErrors = errors[formsetItem]
 
+          // append index to each field name
           formsetErrors.forEach((item, index) => {
             Object.keys(item).map((key) => {
               if (!errorKeys.includes(key)) {
@@ -62,7 +107,6 @@ let djMixin = {
                 delete item[key]
               }
             })
-            // console.log(formsetItem, item)
             this.$refs[formsetItem].setErrors(item)
             this.renderFieldErrors(item, formsetItem)
           })
@@ -71,10 +115,10 @@ let djMixin = {
     },
     uploadFile(event) {
       let formData = new FormData()
-      // save vue instance for being able to refence it later.
+      // save vue instance for being able to reference it later.
       const vm = this
-      // get the parent field name
-      const parentFieldName = event.target.name.split(".")[0]
+      // clear the errors
+      this.$refs.form.setErrors({[event.target.name]: []})
 
       formData.append("file", event.target.files[0])
       axios
@@ -83,12 +127,15 @@ let djMixin = {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then(({data}) => {
+        .then(({ data }) => {
           // save details on the form data which will be sent to the server
-          vm.form[parentFieldName].filename = data.filename
-          vm.form[parentFieldName].path = data.path
+          vm.files[event.target.name] = data
         })
-        .catch((error) => this.error(error, parentFieldName))
+        .catch((error) => {
+          // remove the file from the input
+          event.target.value = null
+          vm.error(error)
+        })
     },
   },
 }

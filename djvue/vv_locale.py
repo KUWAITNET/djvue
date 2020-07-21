@@ -2,7 +2,7 @@
 # Child key is matching the VeeValidate lang codes
 # https://logaretm.github.io/vee-validate/guide/localization.html#using-the-default-i18n
 
-vue_locale = {
+vv_locale = {
     "ar": {
         "ar": {
             "messages": {
@@ -34,7 +34,7 @@ vue_locale = {
             }
         }
     },
-    "en": {
+    "en-us": {
         "en": {
             "messages": {
                 "alpha": "The {_field_} field may only contain alphabetic characters",

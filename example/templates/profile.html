@@ -38,8 +38,7 @@
             mixins: [djVueMixin],
             data() {
                 return {
-                    actionURL: '{% url "profile" %}',
-                    fieldsetRefs: ['working_place'],
+                    actionURL: '{% url "example:profile" %}',
                     form: {
                         username: null,
                         email: null,
@@ -49,7 +48,7 @@
                             job: null,
                             position: null,
                         },
-                        addresses: [],
+                        {#addresses: [],#}
                     }
                 }
             }

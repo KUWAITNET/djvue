@@ -1,15 +1,24 @@
 {% load vue_tags %}
 
 <fieldset>
-  {% if field.label %}
-    <legend {% if style.hide_label %}class="sr-only"{% endif %}>
-      {{ field.label }}
-    </legend>
-  {% endif %}
-
-  {% for nested_field in field %}
-    {% if not nested_field.read_only %}
-      {% render_vue_field nested_field style=style %}
+    {% if field.label %}
+        <legend {% if style.hide_label %}class="sr-only"{% endif %}>
+            {{ field.label }}
+        </legend>
+        {% if field.required %}
+            {# add validation-provider for showing the serialier errors #}
+            <validation-provider name="{{ field.name }}" v-slot="{ errors }" slim>
+                <span class="help-block text-danger" v-for="error in errors" :key="error">{( error )}</span>
+            </validation-provider>
+        {% endif %}
     {% endif %}
-  {% endfor %}
+
+    <validation-observer ref="{{ field.name }}">
+        {% for nested_field in field %}
+            {% if not nested_field.read_only %}
+                {% render_vue_field nested_field style=style %}
+            {% endif %}
+        {% endfor %}
+    </validation-observer>
+
 </fieldset>

@@ -16,6 +16,7 @@ class FileUploadView(APIView):
         - handle directory upload
         - etc
     """
+
     serializer_class = FileUploadSerializer
 
     def post(self, request, *args, **kwargs):
@@ -27,7 +28,7 @@ class FileUploadView(APIView):
 
     def get_success_headers(self, data):
         try:
-            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
+            return {"Location": str(data[api_settings.URL_FIELD_NAME])}
         except (TypeError, KeyError):
             return {}
 
@@ -37,7 +38,7 @@ class FileUploadView(APIView):
         deserializing input, and for serializing output.
         """
         serializer_class = self.get_serializer_class()
-        kwargs['context'] = self.get_serializer_context()
+        kwargs["context"] = self.get_serializer_context()
         return serializer_class(*args, **kwargs)
 
     def get_serializer_class(self):
@@ -52,8 +53,7 @@ class FileUploadView(APIView):
         """
         assert self.serializer_class is not None, (
             "'%s' should either include a `serializer_class` attribute, "
-            "or override the `get_serializer_class()` method."
-            % self.__class__.__name__
+            "or override the `get_serializer_class()` method." % self.__class__.__name__
         )
 
         return self.serializer_class
@@ -62,8 +62,4 @@ class FileUploadView(APIView):
         """
         Extra context provided to the serializer class.
         """
-        return {
-            'request': self.request,
-            'format': self.format_kwarg,
-            'view': self
-        }
+        return {"request": self.request, "format": self.format_kwarg, "view": self}
