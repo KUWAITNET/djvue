@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load vue_tags %}
+
+{% block content %}
+
+    <div id="login-app" hidden>
+        <div class="row">
+            <div class="col-sm">
+                <h2>Login</h2>
+            </div>
+        </div>
+
+        <p v-for="error in nonFieldErrors" :key="error" class="text-danger">{( error )}</p>
+
+        <validation-observer ref="form" v-slot="{ handleSubmit }" mode="lazy">
+            <form @submit.prevent="handleSubmit(submit)" novalidate="true">
+                <div class="row">
+                    <div class="col-sm">
+                        {% render_vue_form serializer %}
+                    </div>
+                </div>
+                <button class="btn btn-primary">Login</button>
+            </form>
+        </validation-observer>
+
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+    <script>
+        new Vue({
+            el: '#login-app',
+            mixins: [djVueMixin],
+            data() {
+                return {
+                    actionURL: '{% url "login" %}',
+                    form: {
+                        email: null,
+                        password: null
+                    }
+                }
+            }
+
+        })
+        // remove hidden
+        let appEl = document.getElementById('login-app');
+        appEl.removeAttribute("hidden");
+    </script>
+
+{% endblock %}

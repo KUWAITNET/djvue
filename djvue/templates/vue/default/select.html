@@ -1,0 +1,40 @@
+{% load rest_framework %}
+
+<validation-provider name="{{ field.name }}"
+        {% if style.rules %} rules="{{ style.rules }}" {% endif %}
+                     v-slot="{ errors, valid, invalid, touched }"
+                     tag="div" class="form-group">
+    {% if field.label %}
+        <label {% if style.hide_label %}class="sr-only"{% endif %}>
+            {{ field.label }}
+        </label>
+    {% endif %}
+
+    <select class="form-control"
+            name="{{ field.name }}"
+            {% if field.required %}required{% endif %}
+            v-model="form.{{ field.name }}"
+            :class="{'is-invalid': touched && invalid, 'is-valid': touched && valid && form.{{ field.name }}}"
+    >
+        {% if field.allow_null or field.allow_blank %}
+            <option value="" {% if not field.value %}selected{% endif %}>--------</option>
+        {% endif %}
+        {% for select in field.iter_options %}
+            {% if select.start_option_group %}
+                <optgroup label="{{ select.label }}">
+                    {% elif select.end_option_group %}
+                </optgroup>
+            {% else %}
+                <option value="{{ select.value }}"
+                        {% if select.value|as_string == field.value|as_string %}selected{% endif %}
+                        {% if select.disabled %}disabled{% endif %}>{{ select.display_text }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <span class="help-block text-danger" v-for="error in errors" :key="error">{( error )}</span>
+
+    {% if field.help_text %}
+        <span class="help-block">{{ field.help_text|safe }}</span>
+    {% endif %}
+</validation-provider>

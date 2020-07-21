@@ -1,0 +1,6 @@
+{% load vue_tags %}
+{% for field in form %}
+  {% if not field.read_only %}
+    {% render_vue_field field style=style %}
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,21 @@
+{% load static %}
+
+<script src="{% static 'vue/js/vue.js' %}"></script>
+<script src="{% static 'vue/js/vee-validate.full.js' %}"></script>
+<script src="{% static 'vue/js/axios.js' %}"></script>
+<script src="{% static 'vue/js/lodash.js' %}"></script>
+<script>
+    Vue.component("validation-provider", VeeValidate.ValidationProvider)
+    Vue.component("validation-observer", VeeValidate.ValidationObserver)
+    VeeValidate.localize({{ vee_validate_locale|safe }})
+    VeeValidate.localize('{{ request.LANGUAGE_CODE }}')
+
+    VeeValidate.extend("password", {
+        params: ["target"],
+        validate(value, {target}) {
+            return value === target
+        },
+        message: "Password confirmation does not match",
+    })
+</script>
+<script src="{% static 'vue/js/script.js' %}"></script>

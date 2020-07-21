@@ -1,0 +1,26 @@
+<validation-provider name="{{ field.name }}"
+        {% if style.rules %} rules="{{ style.rules }}" {% endif %}
+                     v-slot="{ errors, valid, invalid, touched }"
+                     tag="div" class="form-group">
+    {% if field.label %}
+        <label {% if style.hide_label %}class="sr-only"{% endif %}>
+            {{ field.label }}
+        </label>
+    {% endif %}
+
+    <textarea name="{{ field.name }}"
+              class="form-control"
+              {% if style.placeholder %}placeholder="{{ style.placeholder }}"{% endif %}
+              {% if style.rows %}rows="{{ style.rows }}"{% endif %}
+              {% if field.required %}required{% endif %}
+              v-model="form.{{ field.name }}"
+              :class="{'is-invalid': touched && invalid, 'is-valid': touched && valid && form.{{ field.name }}}"
+
+    >
+      {% if field.value %}{{ field.value }}{% endif %}
+  </textarea>
+
+    {% if field.help_text %}
+        <span class="help-block">{{ field.help_text|safe }}</span>
+    {% endif %}
+</validation-provider>

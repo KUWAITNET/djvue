@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load vue_tags %}
+
+{% block content %}
+    <div id="profile-app" hidden>
+        <div class="row">
+            <div class="col-sm">
+                <h2>Profile</h2>
+            </div>
+        </div>
+
+        <p v-for="error in nonFieldErrors" :key="error" class="text-danger">{( error )}</p>
+
+        <validation-observer ref="form" v-slot="{ handleSubmit }" mode="lazy">
+            <form @submit.prevent="handleSubmit(submit)" novalidate="true">
+                <div class="row">
+                    <div class="col-sm">
+                        {% render_vue_field serializer.username %}
+                        {% render_vue_field serializer.email %}
+                        {% render_vue_field serializer.password1 %}
+                        {% render_vue_field serializer.password2 %}
+                        {% render_vue_field serializer.file %}
+                        {% render_vue_field serializer.working_place %}
+                    </div>
+                </div>
+                <button class="btn btn-success">Save</button>
+            </form>
+        </validation-observer>
+
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+
+    <script>
+        let vm = new Vue({
+            el: '#profile-app',
+            mixins: [djVueMixin],
+            data() {
+                return {
+                    actionURL: '{% url "profile" %}',
+                    fieldsetRefs: ['working_place'],
+                    form: {
+                        username: null,
+                        email: null,
+                        password1: null,
+                        password2: null,
+                        working_place: {
+                            job: null,
+                            position: null,
+                        },
+                        addresses: [],
+                    }
+                }
+            }
+
+        })
+        // remove hidden
+        let appEl = document.getElementById('profile-app');
+        appEl.removeAttribute("hidden");
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+<validation-provider name="{{ field.name }}"
+        {% if style.rules %} rules="{{ style.rules }}" {% endif %}
+                     v-slot="{ errors }"
+                     tag="div" class="form-group">
+    <div class="checkbox">
+        <label>
+            <input name="{{ field.name }}"
+                   type="checkbox"
+                   value="true"
+                   {% if field.value %}checked{% endif %}
+                   {% if field.required %}required{% endif %}
+                   v-model="form.{{ field.name }}"
+            >
+            {% if field.label %}{{ field.label }}{% endif %}
+        </label>
+    </div>
+
+    <span class="help-block text-danger" v-for="error in errors" :key="error">{( error )}</span>
+
+    {% if field.help_text %}
+        <span class="help-block">{{ field.help_text|safe }}</span>
+    {% endif %}
+</validation-provider>
