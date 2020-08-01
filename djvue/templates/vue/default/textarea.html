@@ -19,6 +19,7 @@
     >
       {% if field.value %}{{ field.value }}{% endif %}
   </textarea>
+  <span class="help-block text-danger" v-for="error in errors" :key="error">{( error )}</span>
 
     {% if field.help_text %}
         <span class="help-block">{{ field.help_text|safe }}</span>
