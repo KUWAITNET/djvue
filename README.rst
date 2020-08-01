@@ -163,6 +163,26 @@ Render the serializer as an HTML form using ``render_vue_form``. This template t
         </form>
     </validation-observer>
 
+render_vue_field
+----------------
+
+For a more granular control ``render_vue_field`` template tag can be used.
+
+
+.. code-block:: HTML
+
+    <validation-observer ref="form" v-slot="{ handleSubmit }" mode="lazy">
+        <form @submit.prevent="handleSubmit(submit)" novalidate="true">
+            <div class="row">
+                <div class="col-sm">
+                    {% render_vue_field serializer.username %}
+                    {% render_vue_field serializer.password %}
+                </div>
+            </div>
+            <button class="btn btn-primary">Login</button>
+        </form>
+    </validation-observer>
+
 
 **********
 djVueMixin
