@@ -13,7 +13,7 @@
     Vue.component("validation-observer", VeeValidate.ValidationObserver)
 
     VeeValidate.localize({{ vv_locale|safe }})
-    VeeValidate.localize('{{ vv_lang }}')
+    VeeValidate.localize('{{ vv_language }}')
     VeeValidate.extend("password", {
       params: ["target"],
       validate(value, {target}) {

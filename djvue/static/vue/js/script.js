@@ -129,7 +129,7 @@ let djVueMixin = {
         })
         .then(({ data }) => {
           // save details on the form data which will be sent to the server
-          vm.files[event.target.name] = data
+          Vue.set(vm.files, event.target.name, data)
         })
         .catch((error) => {
           // remove the file from the input
