@@ -13,7 +13,7 @@
                {% if style.placeholder %}placeholder="{{ style.placeholder }}"{% endif %}
                {% if field.value is not None %}value="{{ field.value }}"{% endif %}
                {% if field.required %}required{% endif %}
-               @change="uploadFile($event)"
+               @change="uploadFile($event, '{{ style.upload_url }}')"
                :class="{'is-invalid': touched && invalid, 'is-valid': touched && valid && form.{{ field.name }}}"
         >
         <span class="help-block text-danger" v-for="error in errors" :key="error">{( error )}</span>
