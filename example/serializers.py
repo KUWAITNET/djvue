@@ -1,7 +1,9 @@
+from django.core.files.base import ContentFile
+
 from rest_framework import serializers
 
-from djvue.fields import FileField
-from example.models import Address, Profile
+from djvue.fields import FileField, MultipleFileField
+from example.models import Address, Profile, ProfileAttachment
 
 
 class LoginSerializer(serializers.Serializer):
@@ -47,6 +49,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     )
     password2 = serializers.CharField(write_only=True, style={"input_type": "password"})
     file = FileField(required=True)
+    multiple_file = MultipleFileField(required=True)
     working_place = WorkSerializer(write_only=True)
     # addresses = AddressSerializer(many=True)
 
@@ -58,6 +61,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "password1",
             "password2",
             "file",
+            "multiple_file",
             "working_place",
         )
 
@@ -68,6 +72,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "working_place"
         )  # not required, added only for example purpose
         user_file = validated_data.pop("file", None)
+        user_multiple_file = validated_data.pop("multiple_file", None)
         profile = Profile(**validated_data)
         profile.save()
         # # fetch the file from temporary dir
@@ -76,4 +81,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         ):
             with open(user_file["path"], "rb") as f:
                 profile.file.save(user_file["filename"], f)
+        if user_multiple_file is not None and all(
+            [a_file.get("path", False) and a_file.get("filename", False) for a_file in user_multiple_file]
+        ):
+            for a_file in user_multiple_file:
+                with open(a_file["path"], "rb") as f:
+                    ProfileAttachment.objects.create(profile=profile, file=ContentFile(f.read(), a_file["filename"]))
         return profile
