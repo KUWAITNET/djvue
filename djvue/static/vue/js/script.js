@@ -113,16 +113,18 @@ let djVueMixin = {
         }
       })
     },
-    uploadFile(event) {
+    uploadFile(event, url) {
       let formData = new FormData()
       // save vue instance for being able to reference it later.
       const vm = this
       // clear the errors
       this.$refs.form.setErrors({[event.target.name]: []})
 
+      let uploadURL = url !== "" ? url: this.fileUploadURL
+
       formData.append("file", event.target.files[0])
       axios
-        .post(this.fileUploadURL, formData, {
+        .post(uploadURL, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

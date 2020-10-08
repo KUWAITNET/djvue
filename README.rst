@@ -335,6 +335,13 @@ Once the backend is implemented, the Vue.js app is left to be updated and that's
 
 Upon form submission, the uploaded files must be linked with some model or pushed somewhere else. Let's see a trivial example of how that can be done, ``filename`` and ``path`` are always returned by the view using ``FileUploadSerializer`` and ``djVueMixin`` does the job of POSTing them to the ``actionURL`` together with the rest of the form fields.
 
+The current example considers one url for all files which belong to the same form, for handling different validations per file, each field can have it's own upload url by defining ``upload_url`` in field style.
+
+.. code-block:: python
+
+    pdf = FileField(style={"upload_url": reverse_lazy("pdf_upload")})
+    image = FileField(style={"upload_url": reverse_lazy("image_upload")})
+
 ``serializers.py``
 
 .. code-block:: python
