@@ -26,10 +26,13 @@ let djVueMixin = {
     getFormsetRefs() {
       return Object.keys(this.form).filter(key => _.isArray(this.form[key]))
     },
+    getFormData() {
+      return this.form
+    },
     submit() {
       // reset errors
       this.nonFieldErrors = []
-      axios.post(this.actionURL, Object.assign({}, this.form, this.files))
+      axios.post(this.actionURL, Object.assign({}, this.getFormData(), this.files))
           .then(this.success)
           .catch(this.error)
     },
@@ -120,24 +123,26 @@ let djVueMixin = {
       // clear the errors
       this.$refs.form.setErrors({[event.target.name]: []})
 
-      let uploadURL = url !== "" ? url: this.fileUploadURL
+      let uploadURL = !_.isNil(url) ? url: this.fileUploadURL
+      uploadURL = `${uploadURL}?field-name=${event.target.name}`
 
       formData.append("file", event.target.files[0])
       axios
-        .post(uploadURL, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then(({ data }) => {
-          // save details on the form data which will be sent to the server
-          Vue.set(vm.files, event.target.name, data)
-        })
-        .catch((error) => {
-          // remove the file from the input
-          event.target.value = null
-          vm.error(error)
-        })
+          .post(uploadURL, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then(({ data }) => {
+            // save details on the form data which will be sent to the server
+            Vue.set(vm.files, event.target.name, data)
+            vm.$emit('uploadedFile', event)
+          })
+          .catch((error) => {
+            // remove the file from the input
+            event.target.value = null
+            vm.error(error)
+          })
     },
   },
 }

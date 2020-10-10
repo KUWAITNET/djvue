@@ -50,7 +50,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         style={"input_type": "password", "rules": "password:@password2"},
     )
     password2 = serializers.CharField(write_only=True, style={"input_type": "password"})
-    file = FileField(required=True, style={"upload_url": reverse_lazy("example:pdf_upload")})
+    cv = FileField(required=True, style={"upload_url": reverse_lazy("example:pdf_upload")})
     # file = FileField(required=True)
     working_place = WorkSerializer(write_only=True)
     # addresses = AddressSerializer(many=True)
@@ -62,7 +62,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "email",
             "password1",
             "password2",
-            "file",
+            # "file",
+            "cv",
             "working_place",
         )
 
