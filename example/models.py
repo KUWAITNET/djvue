@@ -8,6 +8,14 @@ class Profile(models.Model):
     password = models.CharField(max_length=64)
     file = models.FileField(upload_to="profiles/")
 
+    def multiple_file(self):
+        return [attachment for attachment in self.profileattachment_set.all()]
+
+
+class ProfileAttachment(models.Model):
+    file = models.FileField(upload_to="profiles/")
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+
 
 class Address(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)

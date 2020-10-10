@@ -7,5 +7,8 @@ class RequiredFileValidator:
     requires_context = True
 
     def __call__(self, value, serializer_field):
-        if serializer_field.required and not all(list(value.values())):
+        if serializer_field.required and type(value) == dict and not all(list(value.values())):
+            raise ValidationError(_("This field is required."))
+
+        if serializer_field.required and type(value) == list and len(value) == 0:
             raise ValidationError(_("This field is required."))
