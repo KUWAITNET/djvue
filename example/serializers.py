@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 
 from rest_framework import serializers
 
-from djvue.fields import FileField, MultipleFileField
+from djvue.fields import FileField, ListFileField
 from djvue.serializers import FileUploadSerializer
 from example.models import Address, Profile, ProfileAttachment
 
@@ -51,12 +51,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         style={"input_type": "password", "rules": "password:@password2"},
     )
     password2 = serializers.CharField(write_only=True, style={"input_type": "password"})
-    multiple_file = MultipleFileField(required=True)
+    multiple_file = ListFileField(required=True)
+    multiple_pdf = ListFileField(style={"upload_url": reverse_lazy("example:pdf_upload")})
     file = FileField(required=True, style={"upload_url": reverse_lazy("example:pdf_upload")})
     # cv = FileField(required=True, style={"upload_url": reverse_lazy("example:pdf_upload")})
-
     # file = FileField(required=True)
-    multiple_file = MultipleFileField(required=True)
     working_place = WorkSerializer(write_only=True)
     # addresses = AddressSerializer(many=True)
 
@@ -69,8 +68,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             "password2",
             "file",
             "multiple_file",
-            # "file",
-            "cv",
+            "multiple_pdf",
+            "file",
+            # "cv",
             "working_place",
         )
 

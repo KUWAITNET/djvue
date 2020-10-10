@@ -116,14 +116,14 @@ let djVueMixin = {
         }
       })
     },
-    uploadFile(event, url) {
+    uploadFile(event, url, multiple=false) {
       let formData = new FormData()
       // save vue instance for being able to reference it later.
       const vm = this
       // clear the errors
       this.$refs.form.setErrors({[event.target.name]: []})
 
-      let uploadURL = !_.isNil(url) ? url: this.fileUploadURL
+      let uploadURL = Boolean(url) ? url: this.fileUploadURL
       uploadURL = `${uploadURL}?field-name=${event.target.name}`
 
       formData.append("file", event.target.files[0])
@@ -135,44 +135,25 @@ let djVueMixin = {
           })
           .then(({ data }) => {
             // save details on the form data which will be sent to the server
-            Vue.set(vm.files, event.target.name, data)
-            vm.$emit('uploadedFile', event)
+            if (multiple) {
+              let current_files = []
+              if (event.target.name in vm.files) {
+                current_files = vm.files[event.target.name]
+              }
+              current_files.push(data);
+              Vue.set(vm.files, event.target.name, current_files)
+
+            } else {
+              Vue.set(vm.files, event.target.name, data)
+              vm.$emit('uploadedFile', event)
+            }
+
           })
           .catch((error) => {
             // remove the file from the input
             event.target.value = null
             vm.error(error)
           })
-    },
-    uploadMultipleFile(event) {
-      let formData = new FormData()
-      // save vue instance for being able to reference it later.
-      const vm = this
-      // clear the errors
-      this.$refs.form.setErrors({[event.target.name]: []})
-
-      formData.append("file", event.target.files[0])
-      axios
-        .post(this.fileUploadURL, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then(({ data }) => {
-          // save details on the form data which will be sent to the server
-          if ( event.target.name in vm.files ){
-            current_files = vm.files[event.target.name];
-          } else {
-            current_files = [];
-          };
-          current_files.push(data);
-          Vue.set(vm.files, event.target.name, current_files)
-        })
-        .catch((error) => {
-          // remove the file from the input
-          event.target.value = null
-          vm.error(error)
-        })
     },
   },
 }

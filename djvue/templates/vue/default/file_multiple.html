@@ -13,10 +13,14 @@
                {% if style.placeholder %}placeholder="{{ style.placeholder }}"{% endif %}
                {% if field.value is not None %}value="{{ field.value }}"{% endif %}
                {% if field.required %}required{% endif %}
-               @change="uploadMultipleFile($event)"
+               @change="uploadFile($event, '{{ style.upload_url }}', true)"
                :class="{'is-invalid': touched && invalid, 'is-valid': touched && valid && form.{{ field.name }}}"
         >
         <span class="help-block text-danger" v-for="error in errors" :key="error">{( error )}</span>
+
+        <ul>
+          <li v-for="file in files.{{ field.name }}"> {( file.filename )}</li>
+        </ul>
 
         {% if field.help_text %}
             <span class="help-block">{{ field.help_text|safe }}</span>

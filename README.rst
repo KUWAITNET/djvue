@@ -339,6 +339,7 @@ The current example considers one url for all files which belong to the same for
 
 .. code-block:: python
 
+    any_file = FileField()  # uses the uploadURL defined in the Vue instance
     pdf = FileField(style={"upload_url": reverse_lazy("pdf_upload")})
     image = FileField(style={"upload_url": reverse_lazy("image_upload")})
 
@@ -357,6 +358,37 @@ The current example considers one url for all files which belong to the same for
                 with open(user_file["path"], "rb") as f:
                     profile.file.save(user_file["filename"], f)
             return profile
+
+
+ListFileField
+^^^^^^^^^^^^^
+Implements `multiple <https://www.w3schools.com/tags/att_input_multiple.asp>`_ upload, a list of FileField, inheriting all its features.
+Once a file has been uploaded, the filename will be rendered under it.
+
+.. code-block:: python
+
+    multiple_file = ListFileField()  # uses the uploadURL defined in the Vue instance
+    multiple_pdf = ListFileField(style={"upload_url": reverse_lazy("example:pdf_upload")})
+
+``serializers.py``
+
+.. code-block:: python
+
+    from django.core.files.base import ContentFile
+
+    class ProfileSerializer(serializers.ModelSerializer):
+        def create(self, validated_data):
+            # ...
+            multiple_file = validated_data.pop("multiple_file", None)
+            profile = Profile(**validated_data)
+            profile.save()
+            # fetch the file from temporary dir
+            if multiple_file is not None and all(
+                [a_file.get("path", False) and a_file.get("filename", False) for a_file in multiple_file]
+            ):
+                for a_file in multiple_file:
+                    with open(a_file["path"], "rb") as f:
+                        ProfileAttachment.objects.create(profile=profile, file=ContentFile(f.read(), a_file["filename"]))
 
 
 
