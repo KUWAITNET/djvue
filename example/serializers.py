@@ -53,6 +53,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, style={"input_type": "password"})
     multiple_file = MultipleFileField(required=True)
     file = FileField(required=True, style={"upload_url": reverse_lazy("example:pdf_upload")})
+    # cv = FileField(required=True, style={"upload_url": reverse_lazy("example:pdf_upload")})
+
     # file = FileField(required=True)
     multiple_file = MultipleFileField(required=True)
     working_place = WorkSerializer(write_only=True)
@@ -67,6 +69,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "password2",
             "file",
             "multiple_file",
+            # "file",
+            "cv",
             "working_place",
         )
 
