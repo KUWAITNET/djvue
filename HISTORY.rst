@@ -5,7 +5,7 @@ History
 =======
 
 ******************
-0.1.1 (2020-08-01)
+0.2.1 (2020-11-07)
 ******************
 
 * File upload now supports `multiple` via `ListFileField`
