@@ -143,12 +143,12 @@ let djVueMixin = {
       if (file_size > 1024 * 1024 * max_file_size_mb) {
         if(multiple){
             this.$refs.form.setErrors({
-                files: [file_size_msg]
+                [event.target.name]: [file_size_msg + " " + max_file_size_mb + " " + file_size_unit]
               });
         }
         else{
             this.$refs.form.setErrors({
-                file: [file_size_msg]
+                [event.target.name]: [file_size_msg + " " + max_file_size_mb + " " + file_size_unit]
               });
         }
         return;

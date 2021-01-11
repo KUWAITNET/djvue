@@ -25,7 +25,8 @@
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
-    let file_size_msg = "{% trans 'File size should be less than 15 MB' %}"
+    let file_size_msg = "{% trans 'File size should be less than' %}"
+    let file_size_unit = "{% trans 'Mega Byte' %}"
     let duplicate_file_msg = "{% trans 'This file is already uploaded' %}"
 
 </script>
