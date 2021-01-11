@@ -9,9 +9,15 @@ let djVueMixin = {
       options: {},
       nonFieldErrors: [],
       actionURL: null,
+      uploadInProgress: {},
       form: {},
       files: {},
       fileUploadURL: uploadURL
+    }
+  },
+  computed: {
+    canSubmit: function() {
+      return !this.submitInProgress && !Object.values(this.uploadInProgress).some(e => e === true)
     }
   },
   mounted() {
@@ -116,10 +122,40 @@ let djVueMixin = {
         }
       })
     },
-    uploadFile(event, url, multiple=false) {
+    uploadFile(event, url, max_file_size, multiple=false) {
       let formData = new FormData()
       // save vue instance for being able to reference it later.
       const vm = this
+      file_size = event.target.files[0].size
+      uploaded_files = []
+      if(this.files["files"]){
+          this.files["files"].forEach(key=> {
+            uploaded_files.push(key.filename)
+          })
+      }
+      if(uploaded_files.includes(event.target.files[0].name)){
+        this.$refs.form.setErrors({
+            files: [duplicate_file_msg]
+        });
+        return
+      }
+      let max_file_size_mb = Boolean(max_file_size) ? parseFloat(max_file_size) : 15;
+      if (file_size > 1024 * 1024 * max_file_size_mb) {
+        if(multiple){
+            this.$refs.form.setErrors({
+                files: [file_size_msg]
+              });
+        }
+        else{
+            this.$refs.form.setErrors({
+                file: [file_size_msg]
+              });
+        }
+        return;
+      }
+
+      Vue.set(vm.uploadInProgress, event.target.name, true)
+
       // clear the errors
       this.$refs.form.setErrors({[event.target.name]: []})
 
@@ -128,32 +164,34 @@ let djVueMixin = {
 
       formData.append("file", event.target.files[0])
       axios
-          .post(uploadURL, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then(({ data }) => {
-            // save details on the form data which will be sent to the server
-            if (multiple) {
-              let current_files = []
-              if (event.target.name in vm.files) {
-                current_files = vm.files[event.target.name]
-              }
-              current_files.push(data);
-              Vue.set(vm.files, event.target.name, current_files)
-
-            } else {
-              Vue.set(vm.files, event.target.name, data)
-              vm.$emit('uploadedFile', event)
+        .post(uploadURL, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then(({ data }) => {
+          // save details on the form data which will be sent to the server
+          if (multiple) {
+            let current_files = []
+            if (event.target.name in vm.files) {
+              current_files = vm.files[event.target.name]
             }
+            current_files.push(data);
+            Vue.set(vm.files, event.target.name, current_files)
 
-          })
-          .catch((error) => {
-            // remove the file from the input
-            event.target.value = null
-            vm.error(error)
-          })
+          } else {
+            Vue.set(vm.files, event.target.name, data)
+
+          }
+
+        })
+        .catch((error) => {
+          // remove the file from the input
+          event.target.value = null
+          vm.error(error)
+        }).finally(() => {
+            Vue.set(vm.uploadInProgress, event.target.name, false)
+        })
     },
   },
 }

@@ -25,5 +25,8 @@
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
 
+    let file_size_msg = "{% trans 'File size should be less than 15 MB' %}"
+    let duplicate_file_msg = "{% trans 'This file is already uploaded' %}"
+
 </script>
 <script src="{% static 'vue/js/script.js' %}"></script>
